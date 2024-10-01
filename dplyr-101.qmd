@@ -58,3 +58,37 @@ class(pull(white_wine, quality))
 With `dplyr`, `pull()` is the column extraction function, somewhat similar to the
 dollar `$` operator and to the double bracket `[[]]`. 
 
+
+### Column recoding
+This ggplot call gives a warning because `quality` is numeric which is not
+supported for bar filling in `geom_bar()`.
+
+```{r}
+#| eval: false
+#| code-fold: false
+ggplot(white_wine, aes(x = quality, fill = quality)) +
+  geom_bar()
+```
+
+
+```{r}
+#| eval: false
+white_wine$quality <- factor(white_wine$quality,
+  ordered = TRUE,
+  levels = 3:9
+) ## 3:9 means 3, 4, 5, ..., 9
+white_wine$quality <- white_wine$quality |> factor(
+  ordered = TRUE,
+  levels = 3:9
+) ## 3:9 means 3, 4, 5, ..., 9
+```
+
+```{r}
+white_wine <- white_wine |>
+  mutate(quality = factor(quality, ordered = TRUE, levels = 3:9))
+```
+
+```{r}
+ggplot(white_wine, aes(x = quality, fill = quality)) +
+  geom_bar()
+```
