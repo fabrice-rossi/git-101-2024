@@ -31,3 +31,30 @@ white_wine <- vroom(here("data", "winequality-white.csv"))
 ggplot(white_wine, aes(x = quality)) +
   geom_bar()
 ```
+
+## Data transformation
+```{r}
+#| message: false
+library(dplyr)
+```
+
+### Column extraction 
+```{r}
+class(white_wine)
+## class + column extraction
+class(white_wine$quality)
+## column extraction and then class
+white_wine$quality |> class()
+white_wine[["quality"]] |> class()
+white_wine$`fixed acidity` |> class()
+white_wine[["fixed acidity"]] |> class()
+## dplyr style
+white_wine |>
+  pull(quality) |>
+  class()
+class(pull(white_wine, quality))
+```
+
+With `dplyr`, `pull()` is the column extraction function, somewhat similar to the
+dollar `$` operator and to the double bracket `[[]]`. 
+
