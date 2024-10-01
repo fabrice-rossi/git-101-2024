@@ -92,3 +92,13 @@ white_wine <- white_wine |>
 ggplot(white_wine, aes(x = quality, fill = quality)) +
   geom_bar()
 ```
+
+### Computing new columns
+This is again a task for `mutate()`.
+
+```{r}
+white_wine <- white_wine |>
+  mutate(`captured sulfur dioxide` = `total sulfur dioxide` - `free sulfur dioxide`,
+         `free sd %` = round(`free sulfur dioxide` / `total sulfur dioxide` * 100, 2))
+```
+
