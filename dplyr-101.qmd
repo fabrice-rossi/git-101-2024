@@ -6,3 +6,21 @@ format:
     code-fold: true
 ---
 
+```{r}
+#| message: false
+here::i_am("git-101-2024.Rproj")
+library(here)
+library(vroom)
+```
+
+## Data import
+
+```{r}
+#| message: false
+white_wine <- vroom(here("data", "winequality-white.csv"))
+```
+
+|                        |                      |
+|------------------------|----------------------|
+| Number of observations | `r NROW(white_wine)` |
+| Number of variables    | `r NCOL(white_wine)` |
