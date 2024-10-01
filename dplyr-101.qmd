@@ -11,6 +11,8 @@ format:
 here::i_am("git-101-2024.Rproj")
 library(here)
 library(vroom)
+library(ggplot2)
+theme_set(theme_bw())
 ```
 
 ## Data import
@@ -24,3 +26,8 @@ white_wine <- vroom(here("data", "winequality-white.csv"))
 |------------------------|----------------------|
 | Number of observations | `r NROW(white_wine)` |
 | Number of variables    | `r NCOL(white_wine)` |
+
+```{r}
+ggplot(white_wine, aes(x = quality)) +
+  geom_bar()
+```
