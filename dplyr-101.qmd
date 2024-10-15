@@ -98,8 +98,10 @@ This is again a task for `mutate()`.
 
 ```{r}
 white_wine <- white_wine |>
-  mutate(`captured sulfur dioxide` = `total sulfur dioxide` - `free sulfur dioxide`,
-         `free sd %` = round(`free sulfur dioxide` / `total sulfur dioxide` * 100, 2))
+  mutate(
+    `captured sulfur dioxide` = `total sulfur dioxide` - `free sulfur dioxide`,
+    `free sd %` = round(`free sulfur dioxide` / `total sulfur dioxide` * 100, 2)
+  )
 ```
 
 ## Sub-setting
@@ -107,7 +109,7 @@ white_wine <- white_wine |>
 Column sub-setting is done with the `select()` function.
 
 ```{r}
-white_wine |> 
+white_wine |>
   select(`fixed acidity`, `volatile acidity`, `citric acid`, pH)
 ```
 
@@ -117,7 +119,7 @@ but the original data frame is too big, so we select the first 10 rows with
 
 ```{r}
 #| message: false
-white_wine |> 
+white_wine |>
   select(`fixed acidity`, `volatile acidity`, `citric acid`, pH) |>
   slice(1:10) |>
   knitr::kable()
@@ -126,7 +128,7 @@ Positional selection based on the indices of the columns.
 
 ```{r}
 #| eval: false
-white_wine |> 
+white_wine |>
   select(1:3)
 ```
 
@@ -135,7 +137,7 @@ nature.
 
 ```{r}
 #| eval: false
-white_wine |> 
+white_wine |>
   select(contains("acid") | pH)
 ```
 
@@ -143,13 +145,13 @@ Selection based on the content.
 
 ```{r}
 #| eval: false
-white_wine |> 
+white_wine |>
   select(where(is.factor))
 ```
 
 ```{r}
 #| eval: false
-white_wine |> 
+white_wine |>
   select(where(\(x) is.numeric(x) & (max(x) < 5)))
 ```
 
@@ -158,7 +160,7 @@ white_wine |>
 Simple selection is based on indices with `slice()`. 
 
 ```{r}
-white_wine |> 
+white_wine |>
   slice(1:5, 150:155) |>
   select(alcohol, quality) |>
   knitr::kable()
@@ -167,42 +169,96 @@ white_wine |>
 Condition based selection uses `filter()`.
 
 ```{r}
-white_wine |> 
+white_wine |>
   filter(alcohol > 14) |>
   select(alcohol, quality, `citric acid`, `residual sugar`) |>
   knitr::kable()
 ```
 ### Simple application
 ```{r}
-ggplot(white_wine, aes(x=alcohol)) +
-  geom_density(bw="sj") +
+ggplot(white_wine, aes(x = alcohol)) +
+  geom_density(bw = "sj") +
   geom_rug(alpha = 0.1)
 ```
 ```{r}
-white_wine |> 
+white_wine |>
   filter(alcohol >= 13, `citric acid` < 1) |>
-  ggplot(aes(x=`citric acid`, y=`residual sugar`, color = alcohol)) +
-  geom_point(alpha=0.75) +
+  ggplot(aes(x = `citric acid`, y = `residual sugar`, color = alcohol)) +
+  geom_point(alpha = 0.75) +
   scale_color_viridis_c()
 ```
 
 ```{r}
-white_wine |> 
+white_wine |>
   filter(alcohol <= 9) |>
-  ggplot(aes(x=`citric acid`, y=`residual sugar`, color = alcohol)) +
-  geom_point(alpha=0.75) +
+  ggplot(aes(x = `citric acid`, y = `residual sugar`, color = alcohol)) +
+  geom_point(alpha = 0.75) +
   scale_color_viridis_c()
 ```
 ```{r}
 white_wine |>
   mutate(`alcohol category` = case_when(alcohol <= 9 ~ "low",
-                                        alcohol >= 13 ~ "high",
-                                        .default = "medium")) |>
+    alcohol >= 13 ~ "high",
+    .default = "medium"
+  )) |>
   filter(`alcohol category` != "medium") |>
-  filter(`citric acid` <= 1) |> 
-  ggplot(aes(x=`citric acid`, y=`residual sugar`, color = alcohol)) +
-  geom_point(alpha=0.75) +
+  filter(`citric acid` <= 1) |>
+  ggplot(aes(x = `citric acid`, y = `residual sugar`, color = alcohol)) +
+  geom_point(alpha = 0.75) +
   scale_color_viridis_c() +
   facet_wrap(vars(`alcohol category`))
 ```
 
+## Aggregation functions
+A.k.a. summary functions: turn a possibly long vector into a single
+value (still a vector!).
+
+- standard statistics: `max()`, `min()`, `median()`, etc. 
+- logical operations: `any()` and `all()`
+- counts and ranks: `n()`
+
+### Simple summary use
+Based on the `summarise()` function or inside a `mutate()` call. 
+
+```{r}
+white_wine |>
+  summarise(
+    med_alcohol = median(alcohol),
+    sd(alcohol)
+  )
+```
+
+```{r}
+white_wine |>
+  select(alcohol) |>
+  mutate(m_a = median(alcohol))
+```
+
+```{r}
+white_wine |>
+  select(alcohol) |>
+  mutate(
+    a_m_median = alcohol - median(alcohol),
+    .keep = "none"
+  )
+```
+
+```{r}
+white_wine |>
+  select(alcohol) |>
+  mutate(
+    na = (alcohol - mean(alcohol)) / sd(alcohol),
+    na_r = (alcohol - median(alcohol)) / IQR(alcohol),
+    .keep = "none"
+  )
+```
+
+```{r}
+white_wine |>
+  summarise(
+    mean(alcohol),
+    sd(alcohol),
+    median(alcohol),
+    IQR(alcohol)
+  )
+```
