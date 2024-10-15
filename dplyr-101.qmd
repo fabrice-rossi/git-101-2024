@@ -262,3 +262,36 @@ white_wine |>
     IQR(alcohol)
   )
 ```
+
+### More complex summary functions
+Essentially `quantile()`.
+
+```{r}
+quantile(white_wine$`residual sugar`)
+```
+
+```{r}
+quantile(white_wine$`residual sugar`, probs = seq(0, 1, 0.1))
+```
+
+```{r}
+mean(white_wine$`residual sugar`)
+```
+
+```{r}
+white_wine |>
+  summarise(quantile(`residual sugar`))
+```
+
+```{r}
+white_wine |>
+  reframe(quantile(`residual sugar`),
+          mean(`residual sugar`))
+```
+
+```{r}
+sugar_stats <- white_wine |>
+  summarise(list(quantile(`residual sugar`)),
+            mean(`residual sugar`))
+```
+
