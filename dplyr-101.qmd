@@ -295,3 +295,12 @@ sugar_stats <- white_wine |>
             mean(`residual sugar`))
 ```
 
+### Group by
+#### Introduction
+```{r}
+white_wine |> 
+  summarise(median(`residual sugar`),
+            n(),
+            .by = quality) |>
+  arrange(quality)
+```
