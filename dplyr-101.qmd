@@ -375,4 +375,43 @@ white_wine |>
                              ordered_result = TRUE)) |> 
   ggplot(aes(x=alcohol_class, fill = quality)) +
   geom_bar(position="fill")
+#### Functions with a .by parameter
+Some dplyr verbs support the `.by` parameter: 
+
+- `summarise()`
+- `reframe()`
+- `mutate()`
+- `slice_*()`
+- `filter()`
+
+```{r}
+white_wine |>
+  select(1:2) |> ## first 2 columns
+  slice(1:5) ## first 5 rows
+```
+
+```{r}
+white_wine |>
+  slice(1:5, .by = quality) |> ## first 5 rows
+  select(1:2 | quality) ## first 2 columns (and quality)
+```
+
+```{r}
+white_wine |>
+  slice_sample(n = 1)
+```
+
+```{r}
+white_wine |>
+  slice_sample(n = 1, by = quality) |>
+  select(1:2 | quality)
+```
+```{r}
+white_wine |>
+  slice_max(alcohol, by = quality) |>
+  select(alcohol | quality)
+```
+```{r}
+white_wine |>
+  mutate(avg_alcohol_quality = mean(alcohol), .by = quality)
 ```
