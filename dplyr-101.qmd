@@ -304,3 +304,75 @@ white_wine |>
             .by = quality) |>
   arrange(quality)
 ```
+#### Quantizing continuous variables
+
+```{r}
+white_wine |> 
+  summarise(median(`residual sugar`),
+            n(),
+            .by = alcohol) |>
+  arrange(alcohol)
+```
+
+```{r}
+white_wine |> 
+  mutate(ha = alcohol >= 12.5 ) |> 
+  summarise(median(`residual sugar`),
+            n(),
+            .by = ha) 
+```
+
+```{r}
+white_wine |> 
+  mutate(alcohol_class = cut(alcohol, breaks = c(7, 9, 10, 12, 13, 15), 
+                             ordered_result = TRUE)) |> 
+  summarise(median(`residual sugar`),
+            n(),
+            .by = alcohol_class) 
+```
+
+```{r}
+white_wine |> 
+  mutate(alcohol_class = cut(alcohol, breaks = c(7, 9, 10, 12, 13, 15), 
+                             ordered_result = TRUE)) |> 
+  ggplot(aes(x=alcohol_class)) +
+  geom_bar()
+```
+
+```{r}
+ggplot(white_wine, aes(x=alcohol, y=quality)) +
+  geom_boxplot()
+```
+```{r}
+white_wine |> 
+  mutate(alcohol_class = cut(alcohol, breaks = c(7, 9, 10, 12, 13, 15), 
+                             ordered_result = TRUE)) |> 
+  ggplot(aes(x=alcohol_class, fill = quality)) +
+  geom_bar(position = "fill")
+```
+```{r}
+alcohol_quantiles <- 
+  white_wine |> 
+  pull(alcohol) |>
+  quantile(probs = seq(0, 1, by = 0.1))
+alcohol_quantiles
+```
+```{r}
+alcohol_quantiles[1] <- alcohol_quantiles[1] - 1
+alcohol_quantiles
+```
+
+```{r}
+white_wine |> 
+  mutate(alcohol_class = cut(alcohol, breaks = alcohol_quantiles, 
+                             ordered_result = TRUE)) |> 
+  ggplot(aes(x=alcohol_class)) +
+  geom_bar()
+```
+```{r}
+white_wine |> 
+  mutate(alcohol_class = cut(alcohol, breaks = alcohol_quantiles, 
+                             ordered_result = TRUE)) |> 
+  ggplot(aes(x=alcohol_class, fill = quality)) +
+  geom_bar(position="fill")
+```
