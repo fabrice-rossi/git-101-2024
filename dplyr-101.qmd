@@ -434,3 +434,94 @@ white_wine |>
 white_wine |>
   mutate(avg_alcohol_quality = mean(alcohol), .by = quality)
 ```
+
+#### `group_by()`
+
+```{r}
+white_wine
+```
+
+
+```{r}
+white_wine |>
+  group_by(quality)
+```
+
+```{r}
+white_wine |>
+  summarise(mean(`citric acid`))
+```
+
+```{r}
+white_wine |>
+  group_by(quality) |>
+  summarise(mean(`citric acid`))
+```
+
+```{r}
+white_wine |>
+  summarise(mean(`citric acid`), .by = quality)
+```
+```{r}
+diamonds |>
+  group_by(cut) |>
+  summarise(median(price))
+```
+
+```{r}
+diamonds |>
+  group_by(cut, clarity)
+```
+
+
+```{r}
+diamonds |>
+  group_by(cut, clarity) |>
+  summarise(median(price), .groups = "drop_last") |>
+  arrange(cut, clarity)
+```
+```{r}
+diamonds |>
+  group_by(cut, clarity) |>
+  summarise(price_mc = median(price), .groups = "drop_last") |>
+  summarise(mean(price_mc))
+```
+```{r}
+diamonds |>
+  summarise(median(price), .by = c(cut, clarity)) |>
+  arrange(cut, clarity)
+```
+
+```{r}
+diamonds |>
+  summarise(price_mc = median(price), .by = c(cut, clarity)) |>
+  summarise(mean(price_mc), .by = cut) |>
+  arrange(cut)
+```
+
+```{r}
+diamonds |>
+  group_by(cut, color) |>
+  summarise(N = n(), .groups = "drop_last")
+```
+
+```{r}
+diamonds |>
+  group_by(cut, color) |>
+  summarise(N = n(), .groups = "drop_last") |>
+  summarise(sum(N))
+```
+
+```{r}
+diamonds |>
+  group_by(cut, color) |>
+  summarise(N = n(), .groups = "drop_last") |>
+  mutate(prob = N / sum(N)) |>
+  ungroup()
+```
+```{r}
+diamonds |>
+  summarise(N = n(), .by = c(cut, color)) |>
+  mutate(prob = N / sum(N), .by = cut) |>
+  arrange(cut, color)
+```
