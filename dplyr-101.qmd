@@ -1,5 +1,5 @@
 ---
-title: "Dplyr 101"
+title: "Dplyr and Tidyr 101"
 author: "Fabrice Rossi"
 format: 
   html:
@@ -525,3 +525,143 @@ diamonds |>
   mutate(prob = N / sum(N), .by = cut) |>
   arrange(cut, color)
 ```
+
+## Tidying data
+```{r}
+library(tidyr)
+```
+
+### Long to wide table (pivoting)
+
+```{r}
+color_given_cut <-
+  diamonds |>
+  group_by(cut, color) |>
+  summarise(N = n(), .groups = "drop_last") |>
+  mutate(prob = N / sum(N)) |>
+  ungroup()
+```
+
+```{r}
+color_given_cut |>
+  select(!N) |>
+  pivot_wider(id_cols = cut, 
+              names_from = color, 
+              values_from = prob)
+```
+
+```{r}
+color_given_cut |>
+  pivot_wider(id_cols = cut, 
+              names_from = color, 
+              values_from = c(prob, N))
+```
+
+```{r}
+color_given_cut |>
+  select(!N) |>
+  pivot_wider(names_from = color, 
+              values_from = prob)
+```
+```{r}
+color_given_cut |>
+  select(!prob) |>
+  slice_sample(n = 30) |>
+  pivot_wider(names_from = color, 
+              values_from = N)
+```
+### Wide to long table (pivoting)
+```{r}
+data("world_bank_pop")
+```
+
+```{r}
+world_bank_pop |>
+  filter(indicator == "SP.POP.TOTL") |>
+  select(!indicator) |> 
+  pivot_longer(!country, 
+               names_to = "year", 
+               names_transform = as.integer,
+               values_to = "total population") 
+```
+
+```{r}
+world_bank_pop |>
+  filter(indicator == "SP.POP.TOTL") |>
+  filter(country %in% c("ESP", "FRA")) |>
+  select(!indicator)  
+```
+
+```{r}
+world_bank_pop |>
+  filter(indicator == "SP.POP.TOTL") |>
+  filter(country %in% c("ESP", "FRA")) |>
+  select(!indicator) |>
+  pivot_longer(!country)
+```
+```{r}
+world_bank_pop |>
+  filter(country %in% c("ESP", "FRA")) |>
+  pivot_longer(!country & !indicator)
+```
+
+```{r}
+world_bank_pop |>
+  filter(indicator == "SP.POP.TOTL") |>
+  select(!indicator) |> 
+  pivot_longer(!country, 
+               names_to = "year", 
+               names_transform = as.integer,
+               values_to = "total population") |>
+  filter(country == "ESP") |>
+  ggplot(aes(x=year, y=`total population`)) +
+  geom_line() 
+```
+
+```{r}
+world_bank_pop |>
+  filter(indicator == "SP.POP.TOTL") |>
+  select(!indicator) |> 
+  pivot_longer(!country, 
+               names_to = "year", 
+               names_transform = as.integer,
+               values_to = "total population") |>
+  ggplot(aes(x=year, y=`total population`, color=country)) +
+  geom_line() +
+  theme(legend.position = "none") +
+  scale_y_continuous(transform = "log10")
+```
+
+```{r}
+set.seed(42)
+world_bank_pop |>
+  filter(indicator == "SP.POP.TOTL") |>
+  select(!indicator) |> 
+  filter(!is.na(`2000`)) |> 
+  slice_sample(n=10, weight_by = `2000`) |>
+  pivot_longer(!country, 
+               names_to = "year", 
+               names_transform = as.integer,
+               values_to = "total population") |>
+  ggplot(aes(x=year, y=`total population`, color=country)) +
+  geom_line() +
+  theme(legend.position = "right") +
+  scale_y_continuous(transform = "log10")
+```
+```{r}
+set.seed(42)
+world_bank_pop |>
+  filter(indicator == "SP.POP.TOTL") |>
+  select(!indicator) |> 
+  filter(!is.na(`2000`)) |> 
+  slice_sample(n=10, weight_by = 1/`2000`) |>
+  pivot_longer(!country, 
+               names_to = "year", 
+               names_transform = as.integer,
+               values_to = "total population") |>
+  ggplot(aes(x=year, y=`total population`, color=country)) +
+  geom_line() +
+  theme(legend.position = "right") +
+  scale_y_continuous(transform = "log10")
+```
+
