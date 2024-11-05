@@ -665,3 +665,85 @@ world_bank_pop |>
   scale_y_continuous(transform = "log10")
 ```
 
+## Nesting
+
+```{r}
+class(diamonds)
+```
+
+```{r}
+df_list <- tibble(x = 1:3,
+                  y = letters[1:3],
+                  z = list(c(1, 2),  c("Alice", "Bob", "Charlie"), 3))
+df_list
+```
+```{r}
+list(1, 2, "c")
+```
+
+```{r}
+daf_list <- data.frame(x = 1:3,
+                  y = letters[1:3],
+                  z = I(list(c(1, 2),  c("Alice", "Bob", "Charlie"), 3)))
+daf_list
+```
+### Linear models
+
+```{r}
+#| cache: true
+diamonds_price_lm <- lm(price ~ ., data = diamonds)
+```
+
+```{r}
+diamonds_price_lm
+```
+```{r}
+summary(diamonds_price_lm)
+```
+
+```{r}
+plot(diamonds_price_lm)
+```
+
+```{r}
+#| cache: true
+diamonds_price_cut_lm <- 
+  diamonds |> 
+  nest(.by = cut) |>
+  mutate(sub_lm = lapply(data, \(x) lm(price ~ ., data = x) ))
+```
+
+```{r}
+library(broom)
+diamonds_price_cut_lm <- 
+  diamonds_price_cut_lm |> mutate(tlm = lapply(sub_lm, tidy))
+```
+
+```{r}
+diamonds |> 
+  nest(.by = cut) |>
+  unnest(data)
+```
+
+```{r}
+diamonds_price_cut_lm |> 
+  select(cut, tlm) |>
+  unnest(tlm)
+```
+
+```{r}
+diamonds_price_cut_lm |> 
+  select(cut, tlm) |>
+  unnest(tlm) |>
+  select(cut, term, estimate) |>
+  pivot_wider(names_from = term, values_from = estimate)
+```
+
+```{r}
+diamonds_price_cut_lm |> 
+  select(cut, tlm) |>
+  unnest(tlm) |>
+  filter(p.value < 0.01) |>
+  select(cut, term, estimate) |>
+  pivot_wider(names_from = term, values_from = estimate)
+```
