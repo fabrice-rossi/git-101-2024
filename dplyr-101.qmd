@@ -545,30 +545,38 @@ color_given_cut <-
 ```{r}
 color_given_cut |>
   select(!N) |>
-  pivot_wider(id_cols = cut, 
-              names_from = color, 
-              values_from = prob)
+  pivot_wider(
+    id_cols = cut,
+    names_from = color,
+    values_from = prob
+  )
 ```
 
 ```{r}
 color_given_cut |>
-  pivot_wider(id_cols = cut, 
-              names_from = color, 
-              values_from = c(prob, N))
+  pivot_wider(
+    id_cols = cut,
+    names_from = color,
+    values_from = c(prob, N)
+  )
 ```
 
 ```{r}
 color_given_cut |>
   select(!N) |>
-  pivot_wider(names_from = color, 
-              values_from = prob)
+  pivot_wider(
+    names_from = color,
+    values_from = prob
+  )
 ```
 ```{r}
 color_given_cut |>
   select(!prob) |>
   slice_sample(n = 30) |>
-  pivot_wider(names_from = color, 
-              values_from = N)
+  pivot_wider(
+    names_from = color,
+    values_from = N
+  )
 ```
 ### Wide to long table (pivoting)
 ```{r}
@@ -578,18 +586,19 @@ data("world_bank_pop")
 ```{r}
 world_bank_pop |>
   filter(indicator == "SP.POP.TOTL") |>
-  select(!indicator) |> 
-  pivot_longer(!country, 
-               names_to = "year", 
-               names_transform = as.integer,
-               values_to = "total population") 
+  select(!indicator) |>
+  pivot_longer(!country,
+    names_to = "year",
+    names_transform = as.integer,
+    values_to = "total population"
+  )
 ```
 
 ```{r}
 world_bank_pop |>
   filter(indicator == "SP.POP.TOTL") |>
   filter(country %in% c("ESP", "FRA")) |>
-  select(!indicator)  
+  select(!indicator)
 ```
 
 ```{r}
@@ -608,25 +617,27 @@ world_bank_pop |>
 ```{r}
 world_bank_pop |>
   filter(indicator == "SP.POP.TOTL") |>
-  select(!indicator) |> 
-  pivot_longer(!country, 
-               names_to = "year", 
-               names_transform = as.integer,
-               values_to = "total population") |>
+  select(!indicator) |>
+  pivot_longer(!country,
+    names_to = "year",
+    names_transform = as.integer,
+    values_to = "total population"
+  ) |>
   filter(country == "ESP") |>
-  ggplot(aes(x=year, y=`total population`)) +
-  geom_line() 
+  ggplot(aes(x = year, y = `total population`)) +
+  geom_line()
 ```
 
 ```{r}
 world_bank_pop |>
   filter(indicator == "SP.POP.TOTL") |>
-  select(!indicator) |> 
-  pivot_longer(!country, 
-               names_to = "year", 
-               names_transform = as.integer,
-               values_to = "total population") |>
-  ggplot(aes(x=year, y=`total population`, color=country)) +
+  select(!indicator) |>
+  pivot_longer(!country,
+    names_to = "year",
+    names_transform = as.integer,
+    values_to = "total population"
+  ) |>
+  ggplot(aes(x = year, y = `total population`, color = country)) +
   geom_line() +
   theme(legend.position = "none") +
   scale_y_continuous(transform = "log10")
@@ -636,14 +647,15 @@ world_bank_pop |>
 set.seed(42)
 world_bank_pop |>
   filter(indicator == "SP.POP.TOTL") |>
-  select(!indicator) |> 
-  filter(!is.na(`2000`)) |> 
-  slice_sample(n=10, weight_by = `2000`) |>
-  pivot_longer(!country, 
-               names_to = "year", 
-               names_transform = as.integer,
-               values_to = "total population") |>
-  ggplot(aes(x=year, y=`total population`, color=country)) +
+  select(!indicator) |>
+  filter(!is.na(`2000`)) |>
+  slice_sample(n = 10, weight_by = `2000`) |>
+  pivot_longer(!country,
+    names_to = "year",
+    names_transform = as.integer,
+    values_to = "total population"
+  ) |>
+  ggplot(aes(x = year, y = `total population`, color = country)) +
   geom_line() +
   theme(legend.position = "right") +
   scale_y_continuous(transform = "log10")
@@ -652,14 +664,15 @@ world_bank_pop |>
 set.seed(42)
 world_bank_pop |>
   filter(indicator == "SP.POP.TOTL") |>
-  select(!indicator) |> 
-  filter(!is.na(`2000`)) |> 
-  slice_sample(n=10, weight_by = 1/`2000`) |>
-  pivot_longer(!country, 
-               names_to = "year", 
-               names_transform = as.integer,
-               values_to = "total population") |>
-  ggplot(aes(x=year, y=`total population`, color=country)) +
+  select(!indicator) |>
+  filter(!is.na(`2000`)) |>
+  slice_sample(n = 10, weight_by = 1 / `2000`) |>
+  pivot_longer(!country,
+    names_to = "year",
+    names_transform = as.integer,
+    values_to = "total population"
+  ) |>
+  ggplot(aes(x = year, y = `total population`, color = country)) +
   geom_line() +
   theme(legend.position = "right") +
   scale_y_continuous(transform = "log10")
@@ -672,9 +685,11 @@ class(diamonds)
 ```
 
 ```{r}
-df_list <- tibble(x = 1:3,
-                  y = letters[1:3],
-                  z = list(c(1, 2),  c("Alice", "Bob", "Charlie"), 3))
+df_list <- tibble(
+  x = 1:3,
+  y = letters[1:3],
+  z = list(c(1, 2), c("Alice", "Bob", "Charlie"), 3)
+)
 df_list
 ```
 ```{r}
@@ -682,9 +697,11 @@ list(1, 2, "c")
 ```
 
 ```{r}
-daf_list <- data.frame(x = 1:3,
-                  y = letters[1:3],
-                  z = I(list(c(1, 2),  c("Alice", "Bob", "Charlie"), 3)))
+daf_list <- data.frame(
+  x = 1:3,
+  y = letters[1:3],
+  z = I(list(c(1, 2), c("Alice", "Bob", "Charlie"), 3))
+)
 daf_list
 ```
 ### Linear models
@@ -707,32 +724,32 @@ plot(diamonds_price_lm)
 
 ```{r}
 #| cache: true
-diamonds_price_cut_lm <- 
-  diamonds |> 
+diamonds_price_cut_lm <-
+  diamonds |>
   nest(.by = cut) |>
-  mutate(sub_lm = lapply(data, \(x) lm(price ~ ., data = x) ))
+  mutate(sub_lm = lapply(data, \(x) lm(price ~ ., data = x)))
 ```
 
 ```{r}
 library(broom)
-diamonds_price_cut_lm <- 
+diamonds_price_cut_lm <-
   diamonds_price_cut_lm |> mutate(tlm = lapply(sub_lm, tidy))
 ```
 
 ```{r}
-diamonds |> 
+diamonds |>
   nest(.by = cut) |>
   unnest(data)
 ```
 
 ```{r}
-diamonds_price_cut_lm |> 
+diamonds_price_cut_lm |>
   select(cut, tlm) |>
   unnest(tlm)
 ```
 
 ```{r}
-diamonds_price_cut_lm |> 
+diamonds_price_cut_lm |>
   select(cut, tlm) |>
   unnest(tlm) |>
   select(cut, term, estimate) |>
@@ -740,7 +757,7 @@ diamonds_price_cut_lm |>
 ```
 
 ```{r}
-diamonds_price_cut_lm |> 
+diamonds_price_cut_lm |>
   select(cut, tlm) |>
   unnest(tlm) |>
   filter(p.value < 0.01) |>
@@ -758,7 +775,7 @@ products <- vroom(here("northwind", "Products.csv"))
 The `ProductID` column is the **primary key** of the `products` table. 
 
 ```{r}
-pid_nb <- products |> 
+pid_nb <- products |>
   select(ProductID) |>
   filter(!is.na(ProductID) & !is.nan(ProductID)) |>
   distinct(ProductID) |>
@@ -789,14 +806,14 @@ columns that have the same name. `inner_join` in dplyr implements by default
 the natural join. 
 
 ```{r}
-p_c <- products |> 
+p_c <- products |>
   inner_join(categories)
 ```
 
 Let's break the CategoryID column in products and try to join nevertheless.
 
 ```{r}
-broken_p_c <- products |> 
+broken_p_c <- products |>
   mutate(CategoryID = CategoryID - 1) |>
   inner_join(categories)
 ```
