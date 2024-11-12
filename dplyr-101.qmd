@@ -747,3 +747,23 @@ diamonds_price_cut_lm |>
   select(cut, term, estimate) |>
   pivot_wider(names_from = term, values_from = estimate)
 ```
+
+## Multiple tables
+### Primary key
+
+```{r}
+products <- vroom(here("northwind", "Products.csv"))
+```
+
+The `ProductID` column is the **primary key** of the `products` table. 
+
+```{r}
+pid_nb <- products |> 
+  select(ProductID) |>
+  filter(!is.na(ProductID) & !is.nan(ProductID)) |>
+  distinct(ProductID) |>
+  nrow()
+```
+
+Is `ProductID` a valid **primary key**: `r pid_nb == nrow(products)`. 
+
