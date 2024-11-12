@@ -823,3 +823,53 @@ In this case, as expected, tuples with no match are removed from the result.
 We can verify that `CategoryID` is a foreign key by counting the number of
 tuples in the result. Here this is: `r nrow(p_c) == nrow(products)`. 
 
+### Application examples
+We want a simple table with all the categories (given by their name) and for
+each category the number of products. 
+
+Broken solution
+```{r}
+products |>
+  summarise("Number of products" = n(), .by = CategoryID)
+```
+Summarise and then join.
+```{r}
+#| message: false
+products |>
+  summarise("Number of products" = n(), .by = CategoryID) |>
+  inner_join(categories |> select(!Description),
+    by = join_by(CategoryID)
+  ) |>
+  select(!CategoryID) |>
+  arrange(CategoryName) |>
+  rename(Category = CategoryName) |>
+  relocate(Category) |>
+  knitr::kable()
+```
+Join then summarise.
+```{r}
+products |>
+  select(CategoryID) |>
+  inner_join(categories |> select(Category = CategoryName, CategoryID),
+    by = join_by(CategoryID)
+  ) |>
+  summarise("Number of products" = n(), .by = Category) |>
+  arrange(Category)
+```
+```{r}
+suppliers <- vroom(here("northwind", "Suppliers.csv"))
+```
+
+We want a table of countries that associate a country to the number of products
+that are supplied by suppliers of this country. 
+
+Join the summarise.
+
+```{r}
+products |>
+  select(SupplierID) |>
+  inner_join(suppliers |> select(SupplierID, Country),
+    by = join_by(SupplierID)
+  ) |>
+  summarise("Number of products" = n(), .by = Country)
+```
