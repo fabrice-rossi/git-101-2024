@@ -873,3 +873,33 @@ products |>
   ) |>
   summarise("Number of products" = n(), .by = Country)
 ```
+### Variations over join
+Categories that are supplied by US suppliers.
+```{r}
+cat_usa <-
+  suppliers |>
+  filter(Country == "USA") |>
+  left_join(products, by = join_by(SupplierID)) |>
+  distinct(CategoryID)
+```
+What are the categories that are not supplied by US suppliers?
+
+```{r}
+categories |>
+  anti_join(cat_usa, by = join_by(CategoryID))
+```
+
+```{r}
+categories |>
+  semi_join(cat_usa, by = join_by(CategoryID))
+```
+Direct calculation.
+
+```{r}
+categories |> anti_join(
+  suppliers |>
+    filter(Country == "Germany") |>
+    left_join(products, by = join_by(SupplierID)),
+  by = join_by(CategoryID)
+)
+```
