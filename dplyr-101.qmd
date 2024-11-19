@@ -866,13 +866,34 @@ that are supplied by suppliers of this country.
 Join the summarise.
 
 ```{r}
-products |>
+nb_per_country <-
+  products |>
   select(SupplierID) |>
   inner_join(suppliers |> select(SupplierID, Country),
     by = join_by(SupplierID)
   ) |>
   summarise("Number of products" = n(), .by = Country)
 ```
+
+```{r}
+nb_idx <- nb_per_country |>
+  arrange(desc(`Number of products`)) |>
+  mutate(idx = 1:n())
+```
+
+
+```{r}
+nb_per_country |>
+  arrange(desc(`Number of products`)) |>
+  mutate(idx = 1:n()) |>
+  ggplot(aes(y = idx, x = `Number of products`)) +
+  geom_col(orientation = "y") +
+  scale_y_continuous(
+    breaks = nb_idx |> pull(idx),
+    labels = nb_idx |> pull(Country)
+  )
+```
+
 ### Variations over join
 Categories that are supplied by US suppliers.
 ```{r}
